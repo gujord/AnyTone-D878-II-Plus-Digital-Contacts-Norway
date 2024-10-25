@@ -30,18 +30,18 @@ This project provides two Python scripts for managing and processing DMR and Nor
 
 Clone the repository:
 
-§§§bash
+```bash
 git clone https://github.com/yourusername/radio-contact-manager.git
 cd radio-contact-manager
-§§§
+```
 
 ### Usage
 
 1. **Download User Data**  
    To download contact data, run:
-   §§§bash
+   ```bash
    python download-users.py
-   §§§
+   ```
    Use `-f` or `--force` to download regardless of the Last-Modified date.
 
 2. **Create Contacts List**  
