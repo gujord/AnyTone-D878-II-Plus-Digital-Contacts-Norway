@@ -1,6 +1,7 @@
 # AnyTone D878 II Plus - Digital Contacts for Norway
 
-This project provides two Python scripts for managing and processing DMR and Norwegian amateur radio contact data. The scripts handle downloading, updating, and merging contact information.
+This project provides two Python scripts for managing and processing DMR and Norwegian amateur radio contact data. The scripts handle downloading, updating, and merging contact information. The generated digital_contacts_list.csv can be imported using your CPS.
+![CPS](screenshot-CPS.jpeg)
 
 ## Overview
 
