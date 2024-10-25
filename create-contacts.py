@@ -73,7 +73,7 @@ def normalize_text(text):
     if not text:
         return ''
     # Erstatt norske bokstaver med engelske ekvivalenter
-    replacements = {'Æ': 'AE', 'æ': 'ae', 'Ø': 'O', 'ø': 'o', 'Å': 'A', 'å': 'a'}
+    replacements = {'Æ': 'AE', 'æ': 'ae', 'Ø': '0', 'ø': 'o', 'Å': 'A', 'å': 'a'}
     for original, replacement in replacements.items():
         text = text.replace(original, replacement)
     text = unicodedata.normalize('NFD', text).encode('ascii', 'ignore').decode('utf-8')
