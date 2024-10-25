@@ -31,8 +31,8 @@ This project provides two Python scripts for managing and processing DMR and Nor
 Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/radio-contact-manager.git
-cd radio-contact-manager
+git clone https://github.com/gujord/AnyTone-D878-II-Plus-Digital-Contacts-Norway.git
+cd AnyTone-D878-II-Plus-Digital-Contacts-Norway
 ```
 
 ### Usage
@@ -46,14 +46,14 @@ cd radio-contact-manager
 
 2. **Create Contacts List**  
    After downloading, run:
-   §§§bash
+   ```bash
    python create-contacts.py
-   §§§
+   ```
    This generates the `digital_contacts_list.csv` file.
 
 ## License
 
-Licensed under the MIT License.
+Licensed under the BSD 3-Clause License.
 
 ## Contributions
 
