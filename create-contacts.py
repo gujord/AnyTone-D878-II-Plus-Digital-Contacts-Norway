@@ -72,13 +72,17 @@ def load_user_no_data(filename):
 def normalize_text(text):
     if not text:
         return ''
-    # Erstatt norske bokstaver med engelske ekvivalenter
-    replacements = {'Æ': 'AE', 'æ': 'ae', 'Ø': 'O', 'ø': 'o', 'Å': 'A', 'å': 'a'}
+    
+    # Erstatt store "Ø" med "0" hvis det er første bokstav i et ord eller en bokstav som står alene
+    text = re.sub(r'\bØ\b', '0', text)  # Står alene
+    text = re.sub(r'\bØ', '0', text)    # Første bokstav i et ord
+
+    # Erstatt store og små norske bokstaver, inkludert "Ø" midt i ord
+    replacements = {'Æ': 'A', 'æ': 'a', 'Ø': 'o', 'ø': 'o', 'Å': 'A', 'å': 'a'}
     for original, replacement in replacements.items():
         text = text.replace(original, replacement)
-    text = unicodedata.normalize('NFD', text).encode('ascii', 'ignore').decode('utf-8')
 
-    # Gjør første bokstav i hvert navn stor og etter bindestreker
+    # Gjør første bokstav i hvert ord stor, inkludert ord etter bindestreker
     text = re.sub(r'\b\w+\b', lambda match: match.group(0).capitalize(), text)
     text = re.sub(r'(\w+)-(\w+)', lambda match: f"{match.group(1).capitalize()}-{match.group(2).capitalize()}", text)
 
@@ -88,8 +92,9 @@ def format_callsign(callsign):
     return re.sub(r'[^A-Z0-9]', '', callsign.upper())
 
 def truncate_name(first_name, last_name, max_length=16):
-    """Truncates name by including first name and last name, removing middle name if necessary
-    to fit within max length.
+    """Truncates name by including first name, middle initial (if any), and last name.
+    Prioritizes the first name fully, includes middle name if possible, and then as much
+    of the last name as fits.
 
     Args:
         first_name: The first name.
@@ -99,32 +104,39 @@ def truncate_name(first_name, last_name, max_length=16):
     Returns:
         The truncated name string.
     """
-    # Sjekk at first_name og last_name ikke er tomme strenger
     if not first_name:
         first_name = ""
     if not last_name:
         last_name = ""
 
-    # Split og forbered fornavn og etternavn
-    first_name_parts = first_name.split()
-    primary_first_name = first_name_parts[0] if first_name_parts else ""
-    middle_initial = (
-        f"{first_name_parts[1][0]}" if len(first_name_parts) > 1 and '-' not in first_name_parts[1] else ""
-    )
+    # Split first name and prepare parts
+    first_name_parts = re.split(r'[\s-]', first_name)  # Split by space or hyphen
+    primary_first_name = first_name_parts[0].strip() if first_name_parts else ""
+    middle_name = first_name_parts[1] if len(first_name_parts) > 1 else ""
 
-    # Normaliser etternavn ved å ta kun første del, hvis tilgjengelig
-    last_name_abbrev = last_name.split()[0] if last_name.split() else ""
+    # Start with the full first name
+    truncated_name = primary_first_name
 
-    # Kombiner navn uten dobbel mellomrom
-    full_name = f"{primary_first_name} {middle_initial} {last_name_abbrev}".strip()
-    full_name = re.sub(r'\s+', ' ', full_name)  # Fjern eventuelle doble mellomrom
+    # Try to add the middle name (full or initial) if there's space
+    if middle_name:
+        middle_initial = f"{middle_name[0]}" if len(middle_name) > 1 else middle_name
+        # Full middle name
+        full_middle = f" {middle_name}"
+        middle_as_initial = f" {middle_initial}"
 
-    # Fjern mellomnavn/forkortelse dersom full_name overstiger max_length
-    if len(full_name) > max_length:
-        full_name = f"{primary_first_name} {last_name_abbrev}".strip()
-        full_name = re.sub(r'\s+', ' ', full_name)  # Fjern eventuelle doble mellomrom
+        # Check if adding full middle name is within the limit
+        if len(truncated_name) + len(full_middle) + len(last_name) + 1 <= max_length:
+            truncated_name += full_middle
+        # Otherwise, check if adding the middle initial is within the limit
+        elif len(truncated_name) + len(middle_as_initial) + len(last_name) + 1 <= max_length:
+            truncated_name += middle_as_initial
 
-    return full_name[:max_length]
+    # Add the last name or as much as possible
+    remaining_space = max_length - len(truncated_name) - 1
+    if remaining_space > 0:
+        truncated_name += f" {last_name[:remaining_space]}"
+
+    return truncated_name.strip()
 
 def truncate_city(city, max_length=15):
     return city[:max_length]
@@ -174,4 +186,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
